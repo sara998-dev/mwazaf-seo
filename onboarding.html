@@ -368,7 +368,17 @@
     </div>
   </div>
 
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    // ── Supabase ──
+    const { createClient } = supabase;
+    const db = createClient(
+      'https://kmmtnerbgdhsifcutqlz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttbXRuZXJiZ2Roc2lmY3V0cWx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTYwNjYsImV4cCI6MjA4OTkzMjA2Nn0.axZz2ru7jRTyWnSq_FNKAgqnQL0hq2CI7OmsrV4njko'
+    );
+
     // ── State ──
     let selectedPlatform = null;
 
@@ -430,7 +440,7 @@
     }
 
     // ── Form submit ──
-    document.getElementById('onboarding-form').addEventListener('submit', function(e) {
+    document.getElementById('onboarding-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       let valid = true;
 
@@ -454,7 +464,6 @@
       const data = {
         field:    field,
         platform: selectedPlatform,
-        submittedAt: new Date().toISOString(),
       };
 
       if (selectedPlatform === 'wordpress') {
@@ -462,13 +471,26 @@
         data.wp_pass = document.getElementById('wp-pass').value;
       } else if (selectedPlatform === 'other') {
         data.other_platform = document.getElementById('other-platform-name').value.trim();
-        data.other_user     = document.getElementById('other-user').value.trim();
-        data.other_pass     = document.getElementById('other-pass').value;
+        data.wp_user        = document.getElementById('other-user').value.trim();
+        data.wp_pass        = document.getElementById('other-pass').value;
       } else {
         data.email = getEmailForPlatform(selectedPlatform);
       }
 
-      console.log('Onboarding data:', data); // REPLACE THIS — send to backend
+      // ── إرسال لـ Supabase ──
+      const submitBtn = document.querySelector('[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الإرسال...';
+
+      const { error } = await db.from('onboarding_submissions').insert([data]);
+
+      if (error) {
+        console.error('Supabase error:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'ابدأ الآن';
+        alert('حدث خطأ، حاول مرة ثانية');
+        return;
+      }
 
       showSuccess();
     });
