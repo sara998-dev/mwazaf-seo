@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ابدأ الآن — مقالاتي SEO</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Platform selection grid */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .platform-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 10px;
+      background: var(--bg-raised);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .platform-btn:hover {
+      border-color: var(--gold-dim);
+      color: var(--text);
+    }
+    .platform-btn.active {
+      background: rgba(212,170,78,0.1);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .platform-btn .platform-icon {
+      width: 28px; height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .platform-btn.active .platform-icon { opacity: 1; }
+    .platform-btn .platform-icon svg {
+      width: 20px; height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Conditional platform fields */
+    .platform-fields {
+      display: none;
+      margin-top: 18px;
+      animation: slideDown 0.3s ease;
+    }
+    .platform-fields.visible { display: block; }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* Info box inside platform fields */
+    .info-box {
+      background: rgba(212,170,78,0.05);
+      border: 1px solid rgba(212,170,78,0.18);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .info-box strong { color: var(--text); }
+    .info-box.info-blue {
+      border-color: rgba(100,140,255,0.2);
+      background: rgba(100,140,255,0.04);
+    }
+    .info-box .email-highlight {
+      display: inline-block;
+      background: rgba(212,170,78,0.12);
+      border: 1px solid rgba(212,170,78,0.25);
+      color: var(--gold);
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin: 6px 0;
+      direction: ltr;
+      text-align: left;
+    }
+    .field-note {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    /* Password field with show/hide */
+    .input-with-action {
+      position: relative;
+    }
+    .input-with-action .form-input {
+      padding-left: 44px;
+    }
+    .input-action-btn {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .input-action-btn:hover { color: var(--text-muted); }
+    .input-action-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* Steps with field sub-groups */
+    .fields-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="onboarding-bg"></div>
+
+  <div class="onboarding-wrapper">
+    <div class="onboarding-card">
+
+      <div class="onboarding-logo">مقالاتي <span>SEO</span></div>
+
+      <div class="progress-dots" id="progress-dots">
+        <div class="dot-step active" id="dot-1"></div>
+        <div class="dot-step" id="dot-2"></div>
+        <div class="dot-step" id="dot-3"></div>
+      </div>
+
+      <!-- ══ FORM SCREEN ══ -->
+      <div id="form-screen" class="form-section">
+
+        <div class="onboarding-step-label">خطوة أولى وأخيرة</div>
+
+        <h1>أخبرنا عن موقعك</h1>
+        <p class="welcome-sub">
+          اكتملت عملية الدفع بنجاح — أجب على سؤالين بسيطين وسنبدأ فوراً.
+        </p>
+
+        <form id="onboarding-form" novalidate>
+
+          <!-- ── Q1: المجال ── -->
+          <div class="form-group">
+            <label for="field-input">
+              إيش مجالك؟
+              <span class="hint">المجال اللي تعمل فيه أو تقدم فيه خدماتك</span>
+            </label>
+            <input
+              type="text"
+              id="field-input"
+              class="form-input"
+              placeholder="مثال: عيادة أسنان، محامي، متجر عطور"
+              maxlength="150"
+              autocomplete="off"
+            />
+            <div class="char-count"><span id="char-count">0</span> / 150</div>
+            <div class="error-msg" id="field-error">من فضلك أدخل مجالك</div>
+          </div>
+
+          <!-- ── Q2: المنصة ── -->
+          <div class="form-group">
+            <label>
+              هل موقعك على إحدى هذه المنصات؟
+              <span class="hint">اختر المنصة اللي يعمل عليها موقعك</span>
+            </label>
+
+            <div class="platform-grid">
+
+              <button type="button" class="platform-btn" id="plat-wordpress" onclick="selectPlatform('wordpress')">
+                <span class="platform-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h4m12 0h4M12 2v4m0 12v4"/></svg>
+                </span>
+                WordPress
+              </button>
+
+              <button type="button" class="platform-btn" id="plat-salla" onclick="selectPlatform('salla')">
+                <span class="platform-icon">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                </span>
+                سلة
+              </button>
+
+              <button type="button" class="platform-btn" id="plat-zid" onclick="selectPlatform('zid')">
+                <span class="platform-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </span>
+                زد
+              </button>
+
+              <button type="button" class="platform-btn" id="plat-shopify" onclick="selectPlatform('shopify')">
+                <span class="platform-icon">
+                  <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                </span>
+                شوبيفاي
+              </button>
+
+              <button type="button" class="platform-btn" id="plat-other" onclick="selectPlatform('other')" style="grid-column: span 2;">
+                <span class="platform-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                </span>
+                منصة أخرى
+              </button>
+
+            </div>
+
+            <div class="error-msg" id="platform-error">من فضلك اختر منصة موقعك</div>
+
+            <!-- ── WordPress fields ── -->
+            <div class="platform-fields" id="fields-wordpress">
+              <div class="info-box">
+                <strong>ممتاز!</strong> سنتواصل معك خلال ٢٤ ساعة. نحتاج صلاحية الوصول لنشر المقالات فقط — لن يتم تغيير أي إعداد آخر.
+              </div>
+              <div class="fields-group">
+                <div>
+                  <label for="wp-user" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">اسم المستخدم</label>
+                  <input type="text" id="wp-user" class="form-input" placeholder="admin" autocomplete="off" />
+                </div>
+                <div>
+                  <label for="wp-pass" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">كلمة المرور</label>
+                  <div class="input-with-action">
+                    <input type="password" id="wp-pass" class="form-input" placeholder="••••••••" autocomplete="off" />
+                    <button type="button" class="input-action-btn" onclick="togglePass('wp-pass', this)" tabindex="-1">
+                      <svg viewBox="0 0 24 24" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
+                  <div class="field-note">يمكنك استخدام Application Password من لوحة التحكم لمزيد من الأمان</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Other (CMS-like) fields ── -->
+            <div class="platform-fields" id="fields-other">
+              <div class="info-box">
+                <strong>لا مشكلة!</strong> أخبرنا عن منصتك وسنتواصل معك لإيجاد أفضل طريقة للربط.
+              </div>
+              <div class="fields-group">
+                <div>
+                  <label for="other-platform-name" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">ما اسم منصة موقعك؟</label>
+                  <input type="text" id="other-platform-name" class="form-input" placeholder="مثال: Wix، Squarespace، Webflow..." autocomplete="off" />
+                </div>
+                <div>
+                  <label for="other-user" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">اسم المستخدم (إن وجد)</label>
+                  <input type="text" id="other-user" class="form-input" placeholder="اختياري" autocomplete="off" />
+                </div>
+                <div>
+                  <label for="other-pass" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">كلمة المرور (إن وجدت)</label>
+                  <div class="input-with-action">
+                    <input type="password" id="other-pass" class="form-input" placeholder="اختياري" autocomplete="off" />
+                    <button type="button" class="input-action-btn" onclick="togglePass('other-pass', this)" tabindex="-1">
+                      <svg viewBox="0 0 24 24" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── سلة fields ── -->
+            <div class="platform-fields" id="fields-salla">
+              <div class="info-box info-blue">
+                <strong>أرسل لنا إضافة على هذا الإيميل:</strong>
+                <div><span class="email-highlight">support@maqalatiseo.com</span></div>
+                <!-- REPLACE THIS EMAIL -->
+                من داخل لوحة تحكم سلة ← الفريق ← إضافة عضو — لغرض تثبيت أداة SEO في متجرك وضبطها تلقائياً.
+              </div>
+              <div>
+                <label for="salla-email" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">بريدك الإلكتروني للمتابعة</label>
+                <input type="email" id="salla-email" class="form-input" placeholder="example@domain.com" autocomplete="email" dir="ltr" style="text-align:right;" />
+                <div class="field-note">سنتواصل معك على هذا البريد بخطوات إضافة الفريق</div>
+              </div>
+            </div>
+
+            <!-- ── زد fields ── -->
+            <div class="platform-fields" id="fields-zid">
+              <div class="info-box info-blue">
+                <strong>أرسل لنا إضافة على هذا الإيميل:</strong>
+                <div><span class="email-highlight">support@maqalatiseo.com</span></div>
+                <!-- REPLACE THIS EMAIL -->
+                من داخل لوحة تحكم زد ← الإعدادات ← الفريق ← دعوة عضو — لغرض تثبيت أداة SEO في متجرك وضبطها تلقائياً.
+              </div>
+              <div>
+                <label for="zid-email" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">بريدك الإلكتروني للمتابعة</label>
+                <input type="email" id="zid-email" class="form-input" placeholder="example@domain.com" autocomplete="email" dir="ltr" style="text-align:right;" />
+                <div class="field-note">سنتواصل معك على هذا البريد بخطوات إضافة الفريق</div>
+              </div>
+            </div>
+
+            <!-- ── شوبيفاي fields ── -->
+            <div class="platform-fields" id="fields-shopify">
+              <div class="info-box info-blue">
+                <strong>أرسل لنا إضافة على هذا الإيميل:</strong>
+                <div><span class="email-highlight">support@maqalatiseo.com</span></div>
+                <!-- REPLACE THIS EMAIL -->
+                من داخل لوحة تحكم Shopify ← Settings ← Users and permissions ← Add staff — لغرض تثبيت أداة SEO في متجرك وضبطها تلقائياً.
+              </div>
+              <div>
+                <label for="shopify-email" style="font-size:0.9rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">بريدك الإلكتروني للمتابعة</label>
+                <input type="email" id="shopify-email" class="form-input" placeholder="example@domain.com" autocomplete="email" dir="ltr" style="text-align:right;" />
+                <div class="field-note">سنتواصل معك على هذا البريد بخطوات إضافة الفريق</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── Submit ── -->
+          <div class="submit-area" style="margin-top:24px;">
+            <button type="submit" class="btn-gold btn-gold-full">ابدأ الآن</button>
+            <p class="submit-note">سنتواصل معك خلال ٢٤ ساعة</p>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ══ SUCCESS SCREEN ══ -->
+      <div id="success-screen" class="success-screen">
+
+        <div class="success-icon-wrap">
+          <svg viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+
+        <span class="success-tagline">تم بنجاح</span>
+        <h2>مقالاتي SEO الخاص بك في الطريق</h2>
+        <p>سنتواصل معك خلال ٢٤ ساعة لإتمام الإعداد وبدء النشر.</p>
+
+        <div class="success-steps">
+          <div class="success-step">
+            <div class="success-step-num">١</div>
+            <span>سنتواصل معك خلال ٢٤ ساعة</span>
+          </div>
+          <div class="success-step">
+            <div class="success-step-num">٢</div>
+            <span>نربط موقعك ونضبط إعدادات SEO</span>
+          </div>
+          <div class="success-step">
+            <div class="success-step-num">٣</div>
+            <span>تبدأ المقالات تنشر تلقائياً — كل يوم، للأبد</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ── State ──
+    let selectedPlatform = null;
+
+    // ── Character counter ──
+    const fieldInput = document.getElementById('field-input');
+    fieldInput.addEventListener('input', () => {
+      document.getElementById('char-count').textContent = fieldInput.value.length;
+      if (fieldInput.value.trim()) {
+        fieldInput.classList.remove('error');
+        document.getElementById('field-error').classList.remove('visible');
+      }
+    });
+
+    // ── Platform selector ──
+    const platformFieldsMap = {
+      wordpress: 'fields-wordpress',
+      salla:     'fields-salla',
+      zid:       'fields-zid',
+      shopify:   'fields-shopify',
+      other:     'fields-other',
+    };
+
+    function selectPlatform(platform) {
+      selectedPlatform = platform;
+
+      // Update button active states
+      document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('plat-' + platform).classList.add('active');
+
+      // Hide all field blocks
+      Object.values(platformFieldsMap).forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('visible');
+      });
+
+      // Show relevant fields
+      const targetId = platformFieldsMap[platform];
+      if (targetId) {
+        document.getElementById(targetId).classList.add('visible');
+      }
+
+      // Clear error
+      document.getElementById('platform-error').classList.remove('visible');
+    }
+
+    // ── Password visibility toggle ──
+    function togglePass(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.style.color = isPassword ? 'var(--gold)' : 'var(--text-dim)';
+    }
+
+    // ── Get email field value by platform ──
+    function getEmailForPlatform(platform) {
+      const map = { salla: 'salla-email', zid: 'zid-email', shopify: 'shopify-email' };
+      if (map[platform]) return document.getElementById(map[platform]).value.trim();
+      return '';
+    }
+
+    // ── Form submit ──
+    document.getElementById('onboarding-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let valid = true;
+
+      // Validate field
+      const field = fieldInput.value.trim();
+      if (!field) {
+        fieldInput.classList.add('error');
+        document.getElementById('field-error').classList.add('visible');
+        valid = false;
+      }
+
+      // Validate platform selection
+      if (!selectedPlatform) {
+        document.getElementById('platform-error').classList.add('visible');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      // Collect data
+      const data = {
+        field:    field,
+        platform: selectedPlatform,
+        submittedAt: new Date().toISOString(),
+      };
+
+      if (selectedPlatform === 'wordpress') {
+        data.wp_user = document.getElementById('wp-user').value.trim();
+        data.wp_pass = document.getElementById('wp-pass').value;
+      } else if (selectedPlatform === 'other') {
+        data.other_platform = document.getElementById('other-platform-name').value.trim();
+        data.other_user     = document.getElementById('other-user').value.trim();
+        data.other_pass     = document.getElementById('other-pass').value;
+      } else {
+        data.email = getEmailForPlatform(selectedPlatform);
+      }
+
+      console.log('Onboarding data:', data); // REPLACE THIS — send to backend
+
+      showSuccess();
+    });
+
+    // ── Show success ──
+    function showSuccess() {
+      const formScreen    = document.getElementById('form-screen');
+      const successScreen = document.getElementById('success-screen');
+
+      document.getElementById('dot-1').classList.replace('active', 'done');
+      document.getElementById('dot-2').classList.add('done');
+      document.getElementById('dot-3').classList.add('active');
+
+      formScreen.classList.add('exiting');
+
+      setTimeout(() => {
+        formScreen.style.display   = 'none';
+        successScreen.style.display = 'block';
+        successScreen.classList.add('visible');
+      }, 300);
+    }
+  </script>
+
+</body>
+</html>
