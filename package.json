@@ -1,0 +1,9 @@
+{
+  "name": "mwazaf-seo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "مقالاتي SEO — landing + onboarding",
+  "dependencies": {
+    "resend": "^4.0.0"
+  }
+}
